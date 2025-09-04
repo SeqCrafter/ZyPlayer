@@ -25,8 +25,12 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'latest'
+          node-version: '20'
           # cache: 'yarn'
+
+      - name: Increase Node heap on macOS
+        if: matrix.os == 'macos-latest'
+        run: echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1.6.0
