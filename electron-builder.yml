@@ -78,7 +78,9 @@ mac:
   target:
     - target: dmg
       arch:
+        - x64
         - arm64
+        - universal
 # macOS 平台的 DMG 配置
 dmg:
   # DMG 文件的生成名称
