@@ -496,9 +496,20 @@ const defaultEmpConf = () => {
 // 调用播放器
 const callPlay = async (item) => {
   try {
-    let { url } = formatIndex(item);
+    let { index, url } = formatIndex(item);
     url = decodeURIComponent(url);
-    const originUrl = url;
+    
+    // 获取视频类型：根据当前源的总集数判断是TV还是movie
+    const currentSourceEpisodes = seasonData.value[active.value.flimSource] || [];
+    const videoType = currentSourceEpisodes.length === 1 ? 'movie' : 'tv';
+    const season = videoType === 'tv' ? "true" : "false";
+    // 格式化集数为纯数字
+    let episodeNumber = index.replace(/\D/g, ''); // 提取数字
+    if (!episodeNumber && videoType === 'movie') {
+      episodeNumber = '1'; // 如果无法提取数字且是电影，设置为1
+    }else{
+      episodeNumber = "1";
+    }
     active.value.filmIndex = item;
     const analyzeInfo = analyzeData.value.list.find(item => item.id === active.value.analyzeId);
     let response;
@@ -532,7 +543,10 @@ const callPlay = async (item) => {
     if (tmp.value.preloadNext.init && tmp.value.preloadNext.load && tmp.value.preloadNext.id === item) {
       if (tmp.value.preloadNext.barrage.barrage.length > 0 && tmp.value.preloadNext.barrage.id) barrageRes = tmp.value.preloadNext.barrage;
     } else {
-      barrageRes = await fetchBarrageData(originUrl, extConf.value.setting.barrage, active.value);
+      // 构造新的参数格式：title&&season_number=1&episode={集数}&type={TV或movie}
+      const barrageParams = `${infoConf.value.vod_name}&&season_number=1&episode_number=${episodeNumber}&season=${season}`;
+      console.log(barrageParams);
+      barrageRes = await fetchBarrageData(barrageParams, extConf.value.setting.barrage, active.value);
     };
     if (Array.isArray(barrageRes.barrage) && barrageRes.barrage.length > 0 && barrageRes.id) {
       emits('barrage', { comments: barrageRes.barrage, url: extConf.value.setting.barrage.url, id: barrageRes.id });
@@ -781,7 +795,6 @@ const timerUpdatePlayProcess = async(currentTime: number, duration: number) => {
       const nextInfo = seasonData.value[active.value.flimSource][nextIndex];
       let url = formatIndex(nextInfo).url;
       url = decodeURIComponent(url);
-      const originUrl = url;
       const analyzeInfo = analyzeData.value.list.find(item => item.id === active.value.analyzeId);
       let analyzeType = analyzeInfo?.type !== undefined ? analyzeInfo?.type : -1;
       if (active.value.official) {
@@ -800,7 +813,23 @@ const timerUpdatePlayProcess = async(currentTime: number, duration: number) => {
         tmp.value.preloadNext.mediaType = response.mediaType;
         tmp.value.preloadNext.init = true; // 标识是否预加载完毕
 
-        const barrageRes: { barrage: string[], id: string | number | null } = await fetchBarrageData(originUrl, barrage, active.value);
+        // 获取下一集的集数信息并格式化
+        const nextEpisodeInfo = formatIndex(nextInfo);
+        let nextEpisodeNumber = nextEpisodeInfo.index.replace(/\D/g, ''); // 提取数字
+        
+        // 重新计算视频类型（预加载时需要）
+        const currentSourceEpisodes = seasonData.value[active.value.flimSource] || [];
+        const nextVideoType = currentSourceEpisodes.length === 1 ? 'movie' : 'tv';
+        const nextSeason = nextVideoType === 'tv' ? "true" : "false";
+        
+        if (!nextEpisodeNumber && nextVideoType === 'movie') {
+          nextEpisodeNumber = '1'; // 如果无法提取数字且是电影，设置为1
+        }
+
+        // 构造下一集的弹幕参数
+        const nextBarrageParams = `${infoConf.value.vod_name}&season_number=1&episode_number=${nextEpisodeNumber}&season=${nextSeason}`;
+        console.log("nextBarrageParams:", nextBarrageParams);
+        const barrageRes: { barrage: string[], id: string | number | null } = await fetchBarrageData(nextBarrageParams, barrage, active.value);
         if (Array.isArray(barrageRes.barrage) && barrageRes.barrage.length > 0 && barrageRes.id) tmp.value.preloadNext.barrage = barrageRes;
       }
     } catch (err: any) {
