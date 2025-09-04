@@ -479,19 +479,22 @@ const fetchBarrageData = async (
   let data: any = { barrage: [], id: null };
 
   try {
-    if (!realUrl || !/^(https?:\/\/)/.test(realUrl)) return data;
+    //if (!realUrl || !/^(https?:\/\/)/.test(realUrl)) return data;
     // 去除参数
-    const { origin, pathname, hostname } = new URL(realUrl);
-    realUrl = `${origin}${pathname}`;
+   // const { origin, pathname, hostname } = new URL(realUrl);
+    //const { origin, pathname } = new URL(realUrl);
+    //realUrl = `${origin}${pathname}`;
 
     const { flimSource } = active;
-    const { url, id, key, support, start, mode, color, content } = options;
-
+    console.log('flimSource', flimSource);
+    //const { url, id, key, support, start, mode, color, content } = options;
+    const { url, id, key, start, mode, color, content } = options;
     // 分组条件
     const isValidUrl = typeof url === 'string' && /^(https?:\/\/)/.test(url);
     const isValidId = id && ['string', 'number'].includes(typeof id);
     const isValidKey = typeof key === 'string' && key.length > 0;
-    const isValidSupport = (Array.isArray(support) && support.length > 0 && support.includes(flimSource)) || VIP_LIST.some((domain) => hostname.includes(domain));
+    //const isValidSupport = (Array.isArray(support) && support.length > 0 && support.includes(flimSource)) || VIP_LIST.some((domain) => hostname.includes(domain));
+    const isValidSupport = true;
     const isValidNumbers = [start, mode, color, content].every(value => typeof value === 'number');
     // 综合判断
     if (isValidUrl && isValidId && isValidKey && isValidSupport && isValidNumbers) {

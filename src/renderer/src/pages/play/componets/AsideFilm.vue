@@ -544,7 +544,7 @@ const callPlay = async (item) => {
       if (tmp.value.preloadNext.barrage.barrage.length > 0 && tmp.value.preloadNext.barrage.id) barrageRes = tmp.value.preloadNext.barrage;
     } else {
       // 构造新的参数格式：title&&season_number=1&episode={集数}&type={TV或movie}
-      const barrageParams = `${infoConf.value.vod_name}&&season_number=1&episode_number=${episodeNumber}&season=${season}`;
+      const barrageParams = `${infoConf.value.vod_name}&season_number=1&episode_number=${episodeNumber}&season=${season}`;
       console.log(barrageParams);
       barrageRes = await fetchBarrageData(barrageParams, extConf.value.setting.barrage, active.value);
     };

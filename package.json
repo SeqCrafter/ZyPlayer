@@ -113,7 +113,7 @@
     "electron-localshortcut": "^3.2.1",
     "electron-log": "^5.4.0",
     "electron-updater": "^6.6.2",
-    "electron-vite": "^3.1.0",
+    "electron-vite": "^4.0.0",
     "eslint": "^9.28.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.1.5",
@@ -201,5 +201,6 @@
   },
   "engines": {
     "node": "20 || >= 22"
-  }
+  },
+  "packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
