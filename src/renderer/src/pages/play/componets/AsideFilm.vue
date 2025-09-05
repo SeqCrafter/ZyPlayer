@@ -503,12 +503,14 @@ const callPlay = async (item) => {
     const currentSourceEpisodes = seasonData.value[active.value.flimSource] || [];
     const videoType = currentSourceEpisodes.length === 1 ? 'movie' : 'tv';
     const season = videoType === 'tv' ? "true" : "false";
-    // 格式化集数为纯数字
+    // 格式化集数为纯数字，去掉前导0
     let episodeNumber = index.replace(/\D/g, ''); // 提取数字
-    if (!episodeNumber && videoType === 'movie') {
+    if (episodeNumber) {
+      episodeNumber = parseInt(episodeNumber, 10).toString(); // 去掉前导0
+    } else if (videoType === 'movie') {
       episodeNumber = '1'; // 如果无法提取数字且是电影，设置为1
-    }else{
-      episodeNumber = "1";
+    } else {
+      episodeNumber = '-1'; // 如果无法提取数字且是电视剧，默认设置为1
     }
     active.value.filmIndex = item;
     const analyzeInfo = analyzeData.value.list.find(item => item.id === active.value.analyzeId);
@@ -822,8 +824,13 @@ const timerUpdatePlayProcess = async(currentTime: number, duration: number) => {
         const nextVideoType = currentSourceEpisodes.length === 1 ? 'movie' : 'tv';
         const nextSeason = nextVideoType === 'tv' ? "true" : "false";
         
-        if (!nextEpisodeNumber && nextVideoType === 'movie') {
+        // 格式化集数为纯数字，去掉前导0
+        if (nextEpisodeNumber) {
+          nextEpisodeNumber = parseInt(nextEpisodeNumber, 10).toString(); // 去掉前导0
+        } else if (nextVideoType === 'movie') {
           nextEpisodeNumber = '1'; // 如果无法提取数字且是电影，设置为1
+        } else {
+          nextEpisodeNumber = '-1'; // 如果无法提取数字且是电视剧，默认设置为1
         }
 
         // 构造下一集的弹幕参数
